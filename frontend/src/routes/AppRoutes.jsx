@@ -1,0 +1,36 @@
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+import HomePage from '../pages/HomePage';
+import AdminPage from '../pages/admin/AdminPage';
+import StudentPage from '../pages/student/StudentPage';
+import FacultyPage from '../pages/faculty/FacultyPage';
+
+/**
+ * Central route table.
+ *
+ * Each module has its own top-level route so the three developers can add
+ * nested routes under their own path without touching each other's code
+ * (e.g. Admin adds <Route path="/admin/quizzes" .../> here or via nesting).
+ *
+ * Role-based guards (ProtectedRoute) will wrap these routes once JWT auth
+ * is implemented. Not added yet by design.
+ */
+export default function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+
+      {/* Admin module */}
+      <Route path="/admin" element={<AdminPage />} />
+
+      {/* Student module */}
+      <Route path="/student" element={<StudentPage />} />
+
+      {/* Faculty module */}
+      <Route path="/faculty" element={<FacultyPage />} />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
