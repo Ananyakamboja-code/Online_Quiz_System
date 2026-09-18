@@ -1,13 +1,22 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { ADMIN_NAV_ITEMS } from './adminNavConfig';
 
 /**
  * Admin sidebar navigation.
  *
- * Links: Dashboard, Quiz Management, Results, and a Logout placeholder.
- * Logout is intentionally non-functional until the shared auth layer exists.
+ * Links: Dashboard, Quiz Management, Faculty Details, Results, and Logout.
+ * Logout is a frontend-only redirect to home for now (no auth yet), matching
+ * how the Student and Faculty modules handle it. Real logout will hook into
+ * the shared auth layer once it exists.
  */
 export default function AdminSidebar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    /* No auth — just redirect to home */
+    navigate('/');
+  };
+
   return (
     <aside className="admin-sidebar d-flex flex-column p-3">
       <h6 className="text-uppercase text-white-50 mb-3">Admin Menu</h6>
@@ -27,12 +36,10 @@ export default function AdminSidebar() {
         ))}
       </ul>
 
-      {/* Logout placeholder — no auth implemented yet. */}
       <button
         type="button"
         className="btn btn-outline-light btn-sm mt-3"
-        title="Logout (not implemented yet)"
-        disabled
+        onClick={handleLogout}
       >
         Logout
       </button>
