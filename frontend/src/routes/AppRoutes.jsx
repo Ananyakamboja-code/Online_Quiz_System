@@ -26,8 +26,8 @@ export default function AppRoutes() {
       {/* Student module */}
       <Route path="/student" element={<StudentPage />} />
 
-      {/* Faculty module */}
-      <Route path="/faculty" element={<FacultyPage />} />
+      {/* Faculty module — wildcard enables nested sub-routes inside FacultyPage */}
+      <Route path="/faculty/*" element={<FacultyPage />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
