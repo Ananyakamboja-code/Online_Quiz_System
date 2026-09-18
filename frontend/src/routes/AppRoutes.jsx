@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import HomePage from '../pages/HomePage';
-import AdminPage from '../pages/admin/AdminPage';
+import AdminRoutes from './AdminRoutes';
 import StudentPage from '../pages/student/StudentPage';
 import FacultyPage from '../pages/faculty/FacultyPage';
 
@@ -20,8 +20,9 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
 
-      {/* Admin module */}
-      <Route path="/admin" element={<AdminPage />} />
+      {/* Admin module — nested routes live in AdminRoutes. A shared
+          ProtectedRoute can later wrap this /admin/* branch for RBAC. */}
+      <Route path="/admin/*" element={<AdminRoutes />} />
 
       {/* Student module */}
       <Route path="/student" element={<StudentPage />} />
