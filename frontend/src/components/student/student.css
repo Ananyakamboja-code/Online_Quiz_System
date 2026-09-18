@@ -1,0 +1,278 @@
+/* ================================================================
+   Student Module Styles
+   Visual language mirrors the Faculty module for a consistent app.
+   Scoped to .student-* classes to avoid leaking into Admin/Faculty.
+   ================================================================ */
+
+/* ── Layout ──────────────────────────────────────────────── */
+.student-layout {
+  min-height: 100vh;
+}
+
+.student-content {
+  overflow-y: auto;
+  max-height: calc(100vh - 56px);
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.student-header {
+  background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+  min-height: 56px;
+  z-index: 1030;
+}
+
+.student-header .navbar-brand {
+  font-size: 1.15rem;
+  letter-spacing: 0.3px;
+}
+
+.student-brand-icon {
+  font-size: 1.4rem;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.student-sidebar {
+  width: 260px;
+  min-width: 260px;
+  min-height: calc(100vh - 56px);
+  background: linear-gradient(180deg, #2c3e7a 0%, #1a2452 100%);
+  transition: width 0.3s ease;
+}
+
+.student-sidebar-profile {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.student-avatar {
+  box-shadow: 0 4px 15px rgba(78, 115, 223, 0.35);
+}
+
+/* Nav links */
+.student-nav-link {
+  color: rgba(255, 255, 255, 0.7) !important;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.student-nav-link:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.student-nav-link.active {
+  color: #fff !important;
+  background: rgba(78, 115, 223, 0.45);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 #fff;
+}
+
+.student-nav-icon {
+  font-size: 1.1rem;
+  width: 24px;
+  text-align: center;
+}
+
+/* ── Tables ──────────────────────────────────────────────── */
+.student-content .table th {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+.student-content .table td {
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+/* ── Cards ───────────────────────────────────────────────── */
+.student-content .card {
+  border-radius: 0.75rem;
+}
+
+.student-content .card-header {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 1rem 1.25rem;
+}
+
+/* ── Forms ───────────────────────────────────────────────── */
+.student-content .form-control:focus,
+.student-content .form-select:focus {
+  border-color: #4e73df;
+  box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* ── Stat cards (dashboard / results summary) ────────────── */
+.stat-card {
+  border: none;
+  border-radius: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1) !important;
+}
+.stat-card .stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+.stat-icon.bg-soft-primary { background: #e7ebff; color: #224abe; }
+.stat-icon.bg-soft-success { background: #e3f6ec; color: #198754; }
+.stat-icon.bg-soft-info    { background: #e2f4fb; color: #0aa2c0; }
+.stat-icon.bg-soft-warning { background: #fdf3e2; color: #c07d0a; }
+.stat-icon.bg-soft-danger  { background: #fdecec; color: #b02a37; }
+.stat-card .stat-value { font-size: 1.5rem; font-weight: 700; line-height: 1.1; }
+.stat-card .stat-label { font-size: 0.8rem; color: #6c757d; }
+
+/* ── Welcome hero ────────────────────────────────────────── */
+.student-hero {
+  background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+  color: #fff;
+  border-radius: 0.75rem;
+  padding: 1.5rem 1.75rem;
+}
+.student-hero .btn-light { font-weight: 600; }
+
+/* ── Profile card ────────────────────────────────────────── */
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4e73df, #224abe);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 4px 15px rgba(78, 115, 223, 0.35);
+}
+.profile-detail-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8a90a2;
+  margin-bottom: 0.1rem;
+}
+.profile-detail-value { font-weight: 600; color: #333; }
+
+/* ── Difficulty badges ───────────────────────────────────── */
+.difficulty-badge { font-size: 0.72rem; font-weight: 600; padding: 0.3em 0.6em; }
+.difficulty-Easy   { background-color: #e3f6ec; color: #146c43; }
+.difficulty-Medium { background-color: #fdf3e2; color: #a56404; }
+.difficulty-Hard   { background-color: #fdecec; color: #b02a37; }
+
+.quiz-meta { font-size: 0.85rem; color: #6c757d; }
+
+/* ── Quiz taking screen ──────────────────────────────────── */
+.quiz-timer {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+.quiz-timer.danger { color: #dc3545; }
+
+.question-palette-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  background: #fff;
+  font-weight: 600;
+}
+.question-palette-btn.answered {
+  background-color: #198754;
+  border-color: #198754;
+  color: #fff;
+}
+.question-palette-btn.current {
+  outline: 3px solid #4e73df;
+  outline-offset: 1px;
+}
+
+.option-label {
+  cursor: pointer;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.6rem;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.option-label:hover {
+  border-color: #4e73df;
+  background-color: #f4f6ff;
+}
+.option-label.selected {
+  border-color: #4e73df;
+  background-color: #eef1ff;
+}
+.option-key {
+  width: 28px;
+  height: 28px;
+  border-radius: 0.4rem;
+  background: #eef1ff;
+  color: #224abe;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.option-label.selected .option-key {
+  background: #4e73df;
+  color: #fff;
+}
+
+/* ── Result page ─────────────────────────────────────────── */
+.result-hero { border-radius: 0.75rem; }
+.score-highlight { font-size: 2.4rem; font-weight: 800; line-height: 1; }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 991.98px) {
+  .student-sidebar {
+    width: 220px;
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .student-sidebar {
+    width: 60px;
+    min-width: 60px;
+    overflow: hidden;
+  }
+  .student-sidebar .student-sidebar-profile,
+  .student-sidebar .student-nav-link span:not(.student-nav-icon) {
+    display: none;
+  }
+  .student-nav-link {
+    justify-content: center;
+    padding: 0.7rem;
+  }
+  .student-sidebar .btn-outline-light {
+    font-size: 0;
+    padding: 0.5rem;
+  }
+  .student-sidebar .btn-outline-light::before {
+    content: '🚪';
+    font-size: 1rem;
+  }
+  .student-content {
+    max-height: calc(100vh - 56px);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .student-content {
+    padding: 1rem !important;
+  }
+}

@@ -24,8 +24,8 @@ export default function AppRoutes() {
           ProtectedRoute can later wrap this /admin/* branch for RBAC. */}
       <Route path="/admin/*" element={<AdminRoutes />} />
 
-      {/* Student module */}
-      <Route path="/student" element={<StudentPage />} />
+      {/* Student module — wildcard enables nested sub-routes inside StudentPage */}
+      <Route path="/student/*" element={<StudentPage />} />
 
       {/* Faculty module — wildcard enables nested sub-routes inside FacultyPage */}
       <Route path="/faculty/*" element={<FacultyPage />} />
