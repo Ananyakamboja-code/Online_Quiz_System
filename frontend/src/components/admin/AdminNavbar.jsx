@@ -1,12 +1,20 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 /**
  * Admin top navigation bar.
  *
- * The "Logout" control is a placeholder only — authentication/JWT is a future
- * common team feature, so this button does not perform any auth action yet.
+ * The "Logout" control does a frontend-only redirect to home for now (no auth
+ * yet), matching the Student and Faculty modules. Real logout will hook into
+ * the shared auth layer once it exists.
  */
 export default function AdminNavbar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    /* No auth — just redirect to home */
+    navigate('/');
+  };
+
   return (
     <nav className="navbar navbar-dark admin-navbar px-3">
       <div className="container-fluid">
@@ -15,12 +23,10 @@ export default function AdminNavbar() {
         </Link>
         <div className="d-flex align-items-center gap-3">
           <span className="navbar-text text-white-50 small">Administrator</span>
-          {/* Placeholder only. Real logout comes with the shared auth layer. */}
           <button
             type="button"
             className="btn btn-outline-light btn-sm"
-            title="Logout (not implemented yet)"
-            disabled
+            onClick={handleLogout}
           >
             Logout
           </button>
