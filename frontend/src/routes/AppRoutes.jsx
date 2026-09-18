@@ -23,8 +23,8 @@ export default function AppRoutes() {
       {/* Admin module */}
       <Route path="/admin" element={<AdminPage />} />
 
-      {/* Student module */}
-      <Route path="/student" element={<StudentPage />} />
+      {/* Student module — wildcard enables nested sub-routes inside StudentPage */}
+      <Route path="/student/*" element={<StudentPage />} />
 
       {/* Faculty module — wildcard enables nested sub-routes inside FacultyPage */}
       <Route path="/faculty/*" element={<FacultyPage />} />
