@@ -1,16 +1,17 @@
 import prisma from '../prismaClient.js';
 
 /**
- * Result controller (Admin, read-only).
+ * Result controller (Admin, read-only) — adapted to the shared schema.
  *
- * Lists all quiz results with student name, quiz title, the faculty who created
- * the quiz, score, total questions, computed percentage, and submission date.
+ * Uses the shared `StudentResult` model (not `Result`). Lists all submissions
+ * with student name, quiz title, the faculty who created the quiz, score,
+ * total questions, computed percentage, and submission date.
  */
 
 /** GET /api/admin/results */
 export async function listResults(_req, res, next) {
   try {
-    const results = await prisma.result.findMany({
+    const results = await prisma.studentResult.findMany({
       include: {
         student: { select: { id: true, name: true } },
         quiz: {
