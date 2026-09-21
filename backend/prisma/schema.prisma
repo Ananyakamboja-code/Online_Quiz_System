@@ -22,4 +22,57 @@ model User {
   role      String   // STUDENT | FACULTY | ADMIN
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  createdQuizzes Quiz[]   @relation("QuizCreator")
+  results        Result[]
+}
+
+// A quiz created by a faculty/admin user. Mirrors the `quizzes` entity:
+// id, title, description, duration, created_by, created_at.
+model Quiz {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String   @default("")
+  duration    Int // minutes
+  createdById Int // FK -> User.id (the faculty/admin who created it)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  createdBy User       @relation("QuizCreator", fields: [createdById], references: [id])
+  questions Question[]
+  results   Result[]
+}
+
+// A single multiple-choice question belonging to a quiz. Mirrors the
+// `questions` entity: id, quiz_id, question_text, option_a..d, correct_answer.
+// correctAnswer stores "A" | "B" | "C" | "D" and is never sent to students.
+model Question {
+  id           Int    @id @default(autoincrement())
+  quizId       Int // FK -> Quiz.id
+  questionText String
+  optionA      String
+  optionB      String
+  optionC      String
+  optionD      String
+  correctAnswer String // "A" | "B" | "C" | "D"
+
+  // Relations
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+// A student's completed attempt at a quiz. Mirrors the `results` entity:
+// id, quiz_id, student_id, score, total_questions, submitted_at.
+model Result {
+  id             Int      @id @default(autoincrement())
+  quizId         Int // FK -> Quiz.id
+  studentId      Int // FK -> User.id (role STUDENT)
+  score          Int
+  totalQuestions Int
+  submittedAt    DateTime @default(now())
+
+  // Relations
+  quiz    Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  student User @relation(fields: [studentId], references: [id])
 }

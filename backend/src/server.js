@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { config } from './config.js';
 import authRoutes from './routes/authRoutes.js';
+import studentRoutes from './routes/studentRoutes.js';
 
 const app = express();
 
@@ -16,6 +17,9 @@ app.get('/api/health', (_req, res) => {
 
 // Auth routes
 app.use('/api/auth', authRoutes);
+
+// Student module routes (protected: requireAuth + requireRole STUDENT)
+app.use('/api/student', studentRoutes);
 
 // 404 for unknown API routes
 app.use((req, res) => {
