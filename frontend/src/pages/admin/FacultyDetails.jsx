@@ -1,46 +1,41 @@
 import { useEffect, useMemo, useState } from 'react';
-import { mockFaculty } from '../../data/mockData';
-import { listQuizzes } from '../../data/quizStore';
+import { getFaculty } from '../../services/adminService';
 
 /**
  * Faculty Details (Admin).
  *
  * Read-only view of faculty members with the number of quizzes each has
- * created and their status. Quiz counts are derived from the quizStore so they
- * stay in sync with quizzes created/deleted during the session.
- *
- * Mock-backed for now — replace with a facultyService Axios call later.
+ * created and their status. Data comes from the backend (/api/admin/faculty),
+ * which returns quizzesCreated and status per faculty user.
  */
 export default function FacultyDetails() {
   const [faculty, setFaculty] = useState([]);
-  const [quizzes, setQuizzes] = useState([]);
   const [search, setSearch] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    setFaculty(mockFaculty);
-    setQuizzes(listQuizzes());
+    getFaculty()
+      .then(setFaculty)
+      .catch((e) => setError(e?.response?.data?.message || 'Failed to load faculty.'));
   }, []);
 
   const rows = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return faculty
-      .map((f) => ({
-        ...f,
-        quizzesCreated: quizzes.filter((q) => q.facultyId === f.id).length,
-      }))
-      .filter(
-        (f) =>
-          !term ||
-          f.name.toLowerCase().includes(term) ||
-          f.email.toLowerCase().includes(term) ||
-          f.id.toLowerCase().includes(term)
-      );
-  }, [faculty, quizzes, search]);
+    return faculty.filter(
+      (f) =>
+        !term ||
+        f.name.toLowerCase().includes(term) ||
+        f.email.toLowerCase().includes(term) ||
+        String(f.id).includes(term)
+    );
+  }, [faculty, search]);
 
   return (
     <div>
       <h1 className="h3 mb-1">Faculty Details</h1>
       <p className="text-muted">View faculty members and their quiz activity.</p>
+
+      {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="mb-3">
         <input

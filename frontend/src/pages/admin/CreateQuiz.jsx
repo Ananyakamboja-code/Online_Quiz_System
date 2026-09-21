@@ -1,26 +1,33 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QuizForm from '../../components/admin/QuizForm';
-import { addQuiz } from '../../data/quizStore';
+import { createQuiz } from '../../services/quizService';
 
 /**
  * Create Quiz page.
  *
- * Uses the reusable QuizForm. On submit, writes to the in-memory quizStore
- * (mock-backed) and returns to the quiz list. Replace addQuiz with the
- * quizService.createQuiz Axios call when the backend is ready.
+ * Uses the reusable QuizForm and posts to the backend via quizService.
  */
 export default function CreateQuiz() {
   const navigate = useNavigate();
+  const [error, setError] = useState('');
 
-  const handleSubmit = (values) => {
-    addQuiz(values);
-    navigate('/admin/quizzes');
+  const handleSubmit = async (values) => {
+    setError('');
+    try {
+      await createQuiz(values);
+      navigate('/admin/quizzes');
+    } catch (e) {
+      setError(e?.response?.data?.message || 'Failed to create quiz.');
+    }
   };
 
   return (
     <div>
       <h1 className="h3 mb-1">Create Quiz</h1>
       <p className="text-muted">Add a new quiz to the system.</p>
+
+      {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="card shadow-sm">
         <div className="card-body">

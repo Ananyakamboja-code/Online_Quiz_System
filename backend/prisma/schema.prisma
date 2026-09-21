@@ -1,16 +1,13 @@
 // Prisma schema for the Online Quiz System.
 // Uses SQLite for zero-setup local development. Swap the datasource provider
 // to postgresql/mysql later without changing the models.
-
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
-
 // ─── User ────────────────────────────────────────────────────────────────────
 // Roles: STUDENT | FACULTY | ADMIN (validated in app code)
 model User {
@@ -19,17 +16,16 @@ model User {
   email      String   @unique
   password   String   // bcrypt hash
   role       String   // STUDENT | FACULTY | ADMIN
+  status     String   @default("Active") // Active | Inactive (used by admin faculty listing)
   phone      String?
   department String?
   employeeId String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
   // Relations
   quizzes        Quiz[]          @relation("FacultyQuizzes")
   studentResults StudentResult[] @relation("StudentResults")
 }
-
 // ─── Quiz ────────────────────────────────────────────────────────────────────
 model Quiz {
   id                Int      @id @default(autoincrement())
@@ -43,13 +39,11 @@ model Quiz {
   facultyId         Int
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-
   // Relations
   faculty   User             @relation("FacultyQuizzes", fields: [facultyId], references: [id])
   questions Question[]
   results   StudentResult[]
 }
-
 // ─── Question ────────────────────────────────────────────────────────────────
 model Question {
   id            Int      @id @default(autoincrement())
@@ -61,11 +55,9 @@ model Question {
   optionD       String
   correctAnswer String   // A | B | C | D
   createdAt     DateTime @default(now())
-
   // Relations
   quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
-
 // ─── StudentResult ───────────────────────────────────────────────────────────
 model StudentResult {
   id             Int      @id @default(autoincrement())
@@ -74,7 +66,6 @@ model StudentResult {
   score          Int
   totalQuestions Int
   submittedAt    DateTime @default(now())
-
   // Relations
   student User @relation("StudentResults", fields: [studentId], references: [id])
   quiz    Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)

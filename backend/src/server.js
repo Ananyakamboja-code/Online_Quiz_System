@@ -3,6 +3,7 @@ import cors from 'cors';
 import { config } from './config.js';
 import authRoutes from './routes/authRoutes.js';
 import facultyRoutes from './routes/facultyRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 const app = express();
 
@@ -20,6 +21,9 @@ app.use('/api/auth', authRoutes);
 
 // Faculty routes
 app.use('/api/faculty', facultyRoutes);
+
+// Admin routes (ADMIN-only, enforced inside the router)
+app.use('/api/admin', adminRoutes);
 
 // 404 for unknown API routes
 app.use((req, res) => {
