@@ -1,4 +1,4 @@
-// Prisma schema for the Online Quiz System auth backend.
+// Prisma schema for the Online Quiz System.
 // Uses SQLite for zero-setup local development. Swap the datasource provider
 // to postgresql/mysql later without changing the models.
 
@@ -11,15 +11,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Application roles used for RBAC. SQLite has no native enum, so role is stored
-// as a string and validated in application code against these values:
-//   STUDENT | FACULTY | ADMIN
+// ─── User ────────────────────────────────────────────────────────────────────
+// Roles: STUDENT | FACULTY | ADMIN (validated in app code)
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String   // bcrypt hash — never the plaintext
-  role      String   // STUDENT | FACULTY | ADMIN
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  password   String   // bcrypt hash
+  role       String   // STUDENT | FACULTY | ADMIN
+  phone      String?
+  department String?
+  employeeId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  quizzes        Quiz[]          @relation("FacultyQuizzes")
+  studentResults StudentResult[] @relation("StudentResults")
+}
+
+// ─── Quiz ────────────────────────────────────────────────────────────────────
+model Quiz {
+  id                Int      @id @default(autoincrement())
+  title             String
+  description       String
+  duration          Int      // minutes
+  numberOfQuestions Int
+  startDate         DateTime
+  endDate           DateTime
+  status            String   @default("Draft") // Draft | Active | Inactive
+  facultyId         Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  faculty   User             @relation("FacultyQuizzes", fields: [facultyId], references: [id])
+  questions Question[]
+  results   StudentResult[]
+}
+
+// ─── Question ────────────────────────────────────────────────────────────────
+model Question {
+  id            Int      @id @default(autoincrement())
+  quizId        Int
+  question      String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctAnswer String   // A | B | C | D
+  createdAt     DateTime @default(now())
+
+  // Relations
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+// ─── StudentResult ───────────────────────────────────────────────────────────
+model StudentResult {
+  id             Int      @id @default(autoincrement())
+  studentId      Int
+  quizId         Int
+  score          Int
+  totalQuestions Int
+  submittedAt    DateTime @default(now())
+
+  // Relations
+  student User @relation("StudentResults", fields: [studentId], references: [id])
+  quiz    Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }

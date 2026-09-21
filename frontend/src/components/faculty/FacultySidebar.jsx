@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 
 /**
  * Faculty-specific sidebar with navigation links.
- * Highlights the active route and includes a logout placeholder.
+ * Shows logged-in user's name (from AuthContext), not hardcoded.
  */
 const FACULTY_NAV = [
   { label: 'Dashboard',       path: '/faculty/dashboard',   icon: '📊' },
@@ -16,10 +16,17 @@ const FACULTY_NAV = [
 
 export default function FacultySidebar() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+
+  const userName = user?.name || 'Faculty';
+  const initials = userName
+    .split(' ')
+    .filter((w) => w.length > 0)
+    .map((w) => w[0].toUpperCase())
+    .join('')
+    .slice(0, 2) || 'F';
 
   const handleLogout = async () => {
-    /* Common auth: clear session and return to login */
     await logout();
     navigate('/login', { replace: true });
   };
@@ -29,10 +36,10 @@ export default function FacultySidebar() {
       <div className="faculty-sidebar-profile text-center py-4 px-3">
         <div className="faculty-avatar mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle bg-white text-primary fw-bold"
              style={{ width: 60, height: 60, fontSize: '1.25rem' }}>
-          FU
+          {initials}
         </div>
-        <h6 className="mb-0 text-white">Faculty User</h6>
-        <small className="text-white-50">Computer Science</small>
+        <h6 className="mb-0 text-white">{userName}</h6>
+        <small className="text-white-50">{user?.department || 'Faculty'}</small>
       </div>
 
       <nav className="flex-grow-1 px-3 py-2">
