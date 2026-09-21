@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./student.css";
 
 /**
@@ -29,14 +30,16 @@ function getInitials(name = "") {
 
 function StudentLayout({ children, student, studentName }) {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const displayName = student?.name || studentName || "Student User";
   const subtitle = student?.department || "Student";
   const initials = getInitials(student?.name || studentName);
 
-  const handleLogout = () => {
-    // No auth yet — just return to the home / role-selection page.
-    navigate("/");
+  const handleLogout = async () => {
+    // Common auth: clear session and return to login.
+    await logout();
+    navigate("/login", { replace: true });
   };
 
   return (

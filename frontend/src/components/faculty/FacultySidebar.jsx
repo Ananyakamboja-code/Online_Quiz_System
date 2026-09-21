@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 /**
  * Faculty-specific sidebar with navigation links.
@@ -15,10 +16,12 @@ const FACULTY_NAV = [
 
 export default function FacultySidebar() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
-  const handleLogout = () => {
-    /* No auth — just redirect to home */
-    navigate('/');
+  const handleLogout = async () => {
+    /* Common auth: clear session and return to login */
+    await logout();
+    navigate('/login', { replace: true });
   };
 
   return (

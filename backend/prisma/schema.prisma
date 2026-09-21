@@ -1,0 +1,25 @@
+// Prisma schema for the Online Quiz System auth backend.
+// Uses SQLite for zero-setup local development. Swap the datasource provider
+// to postgresql/mysql later without changing the models.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Application roles used for RBAC. SQLite has no native enum, so role is stored
+// as a string and validated in application code against these values:
+//   STUDENT | FACULTY | ADMIN
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String   // bcrypt hash — never the plaintext
+  role      String   // STUDENT | FACULTY | ADMIN
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
