@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getStoredToken } from '../context/AuthContext';
 
 /**
  * Centralized Axios instance for the whole app.
@@ -29,10 +30,11 @@ const api = axios.create({
  */
 api.interceptors.request.use(
   (config) => {
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // Attach the auth token (mock now, real JWT later) to every request.
+    const token = getStoredToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error)

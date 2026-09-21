@@ -1,20 +1,21 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { ADMIN_NAV_ITEMS } from './adminNavConfig';
+import { useAuth } from '../../context/AuthContext';
 
 /**
  * Admin sidebar navigation.
  *
  * Links: Dashboard, Quiz Management, Faculty Details, Results, and Logout.
- * Logout is a frontend-only redirect to home for now (no auth yet), matching
- * how the Student and Faculty modules handle it. Real logout will hook into
- * the shared auth layer once it exists.
+ * Logout uses the common auth layer: it clears the session and returns the
+ * user to the login page.
  */
 export default function AdminSidebar() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
-  const handleLogout = () => {
-    /* No auth — just redirect to home */
-    navigate('/');
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
   };
 
   return (

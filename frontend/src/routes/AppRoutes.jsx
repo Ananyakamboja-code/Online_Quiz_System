@@ -1,37 +1,66 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import HomePage from '../pages/HomePage';
+import LoginPage from '../pages/LoginPage';
+import Unauthorized from '../pages/Unauthorized';
 import AdminRoutes from './AdminRoutes';
 import StudentPage from '../pages/student/StudentPage';
 import FacultyPage from '../pages/faculty/FacultyPage';
+import ProtectedRoute from './ProtectedRoute';
+import RegisterPage from '../pages/RegisterPage';
+import { ROLES } from '../data/authRoles';
 
 /**
- * Central route table.
+ * Central route table with common authentication + RBAC.
  *
- * Each module has its own top-level route so the three developers can add
- * nested routes under their own path without touching each other's code
- * (e.g. Admin adds <Route path="/admin/quizzes" .../> here or via nesting).
- *
- * Role-based guards (ProtectedRoute) will wrap these routes once JWT auth
- * is implemented. Not added yet by design.
+ * Root "/" opens the login page directly. Public routes: login, register,
+ * unauthorized. Each module branch is wrapped in <ProtectedRoute> with the
+ * roles allowed to access it, so unauthenticated users go to /login and
+ * wrong-role users go to /unauthorized. The guard is frontend UX only — the
+ * backend is the real enforcement point.
  */
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      {/* Root opens the login page directly */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* Admin module — nested routes live in AdminRoutes. A shared
-          ProtectedRoute can later wrap this /admin/* branch for RBAC. */}
-      <Route path="/admin/*" element={<AdminRoutes />} />
+      {/* Public */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* Student module — wildcard enables nested sub-routes inside StudentPage */}
-      <Route path="/student/*" element={<StudentPage />} />
+      {/* Admin module (ADMIN only) */}
+      <Route
+        path="/admin/*"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+            <AdminRoutes />
+          </ProtectedRoute>
+        }
+      />
 
-      {/* Faculty module — wildcard enables nested sub-routes inside FacultyPage */}
-      <Route path="/faculty/*" element={<FacultyPage />} />
+      {/* Student module (STUDENT only) */}
+      <Route
+        path="/student/*"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.STUDENT]}>
+            <StudentPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Faculty module (FACULTY only) */}
+      <Route
+        path="/faculty/*"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.FACULTY]}>
+            <FacultyPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

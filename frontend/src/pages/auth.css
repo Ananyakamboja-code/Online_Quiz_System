@@ -1,0 +1,163 @@
+/* Shared styles for the authentication pages (login + register).
+   Scoped under .auth-* so they don't affect module UIs. */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #4a90d9 0%, #6a5acd 55%, #7b4bc9 100%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+.auth-card-header {
+  padding: 1.75rem 2rem 1rem;
+  text-align: center;
+}
+
+.auth-brand {
+  font-weight: 700;
+  color: #2c3e50;
+  letter-spacing: -0.01em;
+}
+
+.auth-subtitle {
+  color: #6c757d;
+  margin-bottom: 0;
+}
+
+.auth-card-body {
+  padding: 1rem 2rem 2rem;
+}
+
+/* Role selector as a set of selectable cards */
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+
+.role-option {
+  border: 1.5px solid #e2e6ea;
+  border-radius: 12px;
+  padding: 0.85rem 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.05s ease;
+  background: #fff;
+}
+
+.role-option:hover {
+  border-color: #4a90d9;
+  background: #f5f9ff;
+}
+
+.role-option.selected {
+  border-color: #4a90d9;
+  background: #eaf3fe;
+  box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
+}
+
+.role-option:active {
+  transform: scale(0.98);
+}
+
+.role-option .role-icon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.role-option .role-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.role-option .role-desc {
+  font-size: 0.7rem;
+  color: #6c757d;
+  margin-top: 0.15rem;
+  line-height: 1.2;
+}
+
+.auth-submit {
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+}
+
+/* Live password requirement checklist */
+.password-checklist {
+  list-style: none;
+  padding: 0.75rem 0.9rem;
+  margin: 0 0 1rem;
+  background: #f8f9fb;
+  border: 1px solid #e2e6ea;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem 1rem;
+}
+
+.password-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  transition: color 0.15s ease;
+}
+
+.password-checklist li.unmet {
+  color: #8a94a0;
+}
+
+.password-checklist li.met {
+  color: #1e7e34;
+  font-weight: 600;
+}
+
+.password-checklist .check-icon {
+  display: inline-flex;
+  width: 1rem;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 400px) {
+  .password-checklist {
+    grid-template-columns: 1fr;
+  }
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1.25rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.auth-footer a {
+  color: #4a90d9;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 400px) {
+  .role-grid {
+    grid-template-columns: 1fr;
+  }
+}
