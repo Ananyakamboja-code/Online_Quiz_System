@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FacultySidebar from '../../components/faculty/FacultySidebar';
 import FacultyHeader from '../../components/faculty/FacultyHeader';
+import { createQuiz } from '../../services/facultyApi';
 
 const INITIAL_FORM = {
   title: '',
@@ -15,21 +17,37 @@ const INITIAL_FORM = {
 export default function CreateQuiz() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    /* No API — just show success with local state */
-    setSuccessMsg(`Quiz "${form.title}" created successfully! (local state only)`);
-    setTimeout(() => setSuccessMsg(''), 4000);
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      await createQuiz(form);
+      setSuccessMsg(`Quiz "${form.title}" created successfully!`);
+      setForm(INITIAL_FORM);
+      setTimeout(() => {
+        setSuccessMsg('');
+        navigate('/faculty/my-quizzes');
+      }, 2000);
+    } catch (err) {
+      setErrorMsg(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClear = () => {
     setForm(INITIAL_FORM);
     setSuccessMsg('');
+    setErrorMsg('');
   };
 
   return (
@@ -49,54 +67,47 @@ export default function CreateQuiz() {
               <button type="button" className="btn-close" onClick={() => setSuccessMsg('')} aria-label="Close"></button>
             </div>
           )}
+          {errorMsg && (
+            <div className="alert alert-danger alert-dismissible fade show" role="alert">
+              {errorMsg}
+              <button type="button" className="btn-close" onClick={() => setErrorMsg('')} aria-label="Close"></button>
+            </div>
+          )}
 
           <div className="card border-0 shadow-sm">
             <div className="card-body p-4">
               <form onSubmit={handleSubmit}>
                 <div className="row g-3">
-                  {/* Quiz Title */}
                   <div className="col-md-6">
                     <label htmlFor="title" className="form-label fw-semibold">Quiz Title</label>
                     <input type="text" className="form-control" id="title" name="title"
                       placeholder="Enter quiz title" value={form.title} onChange={handleChange} required />
                   </div>
-
-                  {/* Duration */}
                   <div className="col-md-3">
                     <label htmlFor="duration" className="form-label fw-semibold">Duration (minutes)</label>
                     <input type="number" className="form-control" id="duration" name="duration"
                       placeholder="e.g. 30" value={form.duration} onChange={handleChange} min="1" required />
                   </div>
-
-                  {/* Number of Questions */}
                   <div className="col-md-3">
                     <label htmlFor="numberOfQuestions" className="form-label fw-semibold">Number of Questions</label>
                     <input type="number" className="form-control" id="numberOfQuestions" name="numberOfQuestions"
                       placeholder="e.g. 20" value={form.numberOfQuestions} onChange={handleChange} min="1" required />
                   </div>
-
-                  {/* Description */}
                   <div className="col-12">
                     <label htmlFor="description" className="form-label fw-semibold">Description</label>
                     <textarea className="form-control" id="description" name="description" rows="3"
                       placeholder="Brief description of the quiz" value={form.description} onChange={handleChange} required />
                   </div>
-
-                  {/* Start Date */}
                   <div className="col-md-4">
                     <label htmlFor="startDate" className="form-label fw-semibold">Start Date</label>
                     <input type="date" className="form-control" id="startDate" name="startDate"
                       value={form.startDate} onChange={handleChange} required />
                   </div>
-
-                  {/* End Date */}
                   <div className="col-md-4">
                     <label htmlFor="endDate" className="form-label fw-semibold">End Date</label>
                     <input type="date" className="form-control" id="endDate" name="endDate"
                       value={form.endDate} onChange={handleChange} required />
                   </div>
-
-                  {/* Status */}
                   <div className="col-md-4">
                     <label htmlFor="status" className="form-label fw-semibold">Status</label>
                     <select className="form-select" id="status" name="status" value={form.status} onChange={handleChange}>
@@ -106,11 +117,9 @@ export default function CreateQuiz() {
                     </select>
                   </div>
                 </div>
-
-                {/* Buttons */}
                 <div className="d-flex gap-3 mt-4">
-                  <button type="submit" className="btn btn-primary px-4">
-                    ➕ Create Quiz
+                  <button type="submit" className="btn btn-primary px-4" disabled={loading}>
+                    {loading ? '⏳ Creating...' : '➕ Create Quiz'}
                   </button>
                   <button type="button" className="btn btn-outline-secondary px-4" onClick={handleClear}>
                     🗑️ Clear
