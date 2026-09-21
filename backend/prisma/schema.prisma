@@ -1,72 +1,72 @@
 // Prisma schema for the Online Quiz System.
 // Uses SQLite for zero-setup local development. Swap the datasource provider
 // to postgresql/mysql later without changing the models.
-
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
-
-// Application roles used for RBAC. SQLite has no native enum, so role is stored
-// as a string and validated in application code against these values:
-//   STUDENT | FACULTY | ADMIN
+// ─── User ────────────────────────────────────────────────────────────────────
+// Roles: STUDENT | FACULTY | ADMIN (validated in app code)
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String   // bcrypt hash — never the plaintext
-  role      String   // STUDENT | FACULTY | ADMIN
-  status    String   @default("Active") // Active | Inactive (used for faculty listing)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  password   String   // bcrypt hash
+  role       String   // STUDENT | FACULTY | ADMIN
+  status     String   @default("Active") // Active | Inactive (used by admin faculty listing)
+  phone      String?
+  department String?
+  employeeId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   // Relations
-  quizzes   Quiz[]   @relation("QuizCreator") // quizzes this user (faculty) created
-  results   Result[] // quiz attempts submitted by this user (student)
+  quizzes        Quiz[]          @relation("FacultyQuizzes")
+  studentResults StudentResult[] @relation("StudentResults")
 }
-
-// A quiz is created by a FACULTY user. Admin manages quiz-level data.
+// ─── Quiz ────────────────────────────────────────────────────────────────────
 model Quiz {
-  id          Int        @id @default(autoincrement())
-  title       String
-  description String
-  duration    Int        // minutes
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  // Creator (faculty)
-  facultyId   Int
-  faculty     User       @relation("QuizCreator", fields: [facultyId], references: [id])
-
-  questions   Question[]
-  results     Result[]
+  id                Int      @id @default(autoincrement())
+  title             String
+  description       String
+  duration          Int      // minutes
+  numberOfQuestions Int
+  startDate         DateTime
+  endDate           DateTime
+  status            String   @default("Draft") // Draft | Active | Inactive
+  facultyId         Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  // Relations
+  faculty   User             @relation("FacultyQuizzes", fields: [facultyId], references: [id])
+  questions Question[]
+  results   StudentResult[]
 }
-
-// Questions belong to a quiz. Owned by the Faculty module (Admin does not edit).
+// ─── Question ────────────────────────────────────────────────────────────────
 model Question {
-  id            Int    @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   quizId        Int
-  quiz          Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  questionText  String
+  question      String
   optionA       String
   optionB       String
   optionC       String
   optionD       String
-  correctAnswer String // 'A' | 'B' | 'C' | 'D'
+  correctAnswer String   // A | B | C | D
+  createdAt     DateTime @default(now())
+  // Relations
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
-
-// A student's submission/score for a quiz.
-model Result {
+// ─── StudentResult ───────────────────────────────────────────────────────────
+model StudentResult {
   id             Int      @id @default(autoincrement())
-  quizId         Int
-  quiz           Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   studentId      Int
-  student        User     @relation(fields: [studentId], references: [id])
+  quizId         Int
   score          Int
   totalQuestions Int
   submittedAt    DateTime @default(now())
+  // Relations
+  student User @relation("StudentResults", fields: [studentId], references: [id])
+  quiz    Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }

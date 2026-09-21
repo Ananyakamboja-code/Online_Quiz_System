@@ -41,6 +41,7 @@ export function AuthProvider({ children }) {
   }, [auth]);
 
   // On mount: if we have a token, confirm it's still valid via /auth/me.
+  // Skipped when no backend is running to avoid network errors.
   useEffect(() => {
     let cancelled = false;
     const stored = readStored();
@@ -53,11 +54,14 @@ export function AuthProvider({ children }) {
       .then((user) => {
         if (cancelled) return;
         if (user) {
-          // Refresh the user record in case it changed server-side.
           setAuth((prev) => (prev ? { ...prev, user } : { user, token: stored.token }));
         } else {
           setAuth(null); // token invalid/expired
         }
+      })
+      .catch(() => {
+        // Backend not running — clear stale session silently.
+        if (!cancelled) setAuth(null);
       })
       .finally(() => {
         if (!cancelled) setBootstrapping(false);

@@ -26,6 +26,8 @@ function toSafeUser(user) {
     name: user.name,
     email: user.email,
     role: user.role,
+    employeeId: user.employeeId || null,
+    department: user.department || null,
   };
 }
 
@@ -61,8 +63,17 @@ export async function register(req, res, next) {
     }
 
     const hash = await bcrypt.hash(password, 10);
+
+    // Auto-generate employee ID for FACULTY on registration.
+    let employeeId = null;
+    if (role === 'FACULTY') {
+      const year = new Date().getFullYear();
+      const random = String(Math.floor(1000 + Math.random() * 9000)); // 4-digit
+      employeeId = `FAC-${year}-${random}`;
+    }
+
     const user = await prisma.user.create({
-      data: { name, email, password: hash, role },
+      data: { name, email, password: hash, role, ...(employeeId && { employeeId }) },
     });
 
     const token = signToken(user);
