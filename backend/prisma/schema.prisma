@@ -1,4 +1,4 @@
-// Prisma schema for the Online Quiz System auth backend.
+// Prisma schema for the Online Quiz System.
 // Uses SQLite for zero-setup local development. Swap the datasource provider
 // to postgresql/mysql later without changing the models.
 
@@ -20,6 +20,53 @@ model User {
   email     String   @unique
   password  String   // bcrypt hash — never the plaintext
   role      String   // STUDENT | FACULTY | ADMIN
+  status    String   @default("Active") // Active | Inactive (used for faculty listing)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  quizzes   Quiz[]   @relation("QuizCreator") // quizzes this user (faculty) created
+  results   Result[] // quiz attempts submitted by this user (student)
+}
+
+// A quiz is created by a FACULTY user. Admin manages quiz-level data.
+model Quiz {
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String
+  duration    Int        // minutes
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Creator (faculty)
+  facultyId   Int
+  faculty     User       @relation("QuizCreator", fields: [facultyId], references: [id])
+
+  questions   Question[]
+  results     Result[]
+}
+
+// Questions belong to a quiz. Owned by the Faculty module (Admin does not edit).
+model Question {
+  id            Int    @id @default(autoincrement())
+  quizId        Int
+  quiz          Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  questionText  String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctAnswer String // 'A' | 'B' | 'C' | 'D'
+}
+
+// A student's submission/score for a quiz.
+model Result {
+  id             Int      @id @default(autoincrement())
+  quizId         Int
+  quiz           Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  studentId      Int
+  student        User     @relation(fields: [studentId], references: [id])
+  score          Int
+  totalQuestions Int
+  submittedAt    DateTime @default(now())
 }

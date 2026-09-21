@@ -1,17 +1,18 @@
-import { useState } from 'react';
-import { mockFaculty } from '../../data/mockData';
+import { useEffect, useState } from 'react';
+import { getFaculty } from '../../services/adminService';
 
 /**
  * Reusable quiz form used by both Create and Edit pages.
  *
  * Props:
  * - initialValues: { title, description, duration, facultyId } to prefill
- * - onSubmit(values): called with validated values (includes facultyId + facultyName)
+ * - onSubmit(values): called with validated values ({ title, description, duration, facultyId })
  * - onCancel(): called when Cancel is clicked
  * - submitLabel: text for the submit button
  *
  * Validation is basic and client-side only: title/description/faculty required,
- * duration must be a positive number.
+ * duration must be a positive number. The faculty dropdown is loaded from the
+ * backend (real FACULTY users); the server derives facultyName from facultyId.
  *
  * NOTE: Admin sets quiz-level data including which faculty owns the quiz.
  * Questions are NOT part of this form — they are managed by the Faculty module.
@@ -26,6 +27,14 @@ export default function QuizForm({
 }) {
   const [values, setValues] = useState({ ...EMPTY, ...initialValues });
   const [errors, setErrors] = useState({});
+  const [faculty, setFaculty] = useState([]);
+  const [facultyError, setFacultyError] = useState('');
+
+  useEffect(() => {
+    getFaculty()
+      .then(setFaculty)
+      .catch(() => setFacultyError('Could not load faculty list.'));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,13 +59,11 @@ export default function QuizForm({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
-    const faculty = mockFaculty.find((f) => f.id === values.facultyId);
     onSubmit({
       title: values.title.trim(),
       description: values.description.trim(),
       duration: Number(values.duration),
-      facultyId: values.facultyId,
-      facultyName: faculty ? faculty.name : '',
+      facultyId: Number(values.facultyId),
     });
   };
 
@@ -127,7 +134,7 @@ export default function QuizForm({
           onChange={handleChange}
         >
           <option value="">Select Faculty</option>
-          {mockFaculty.map((f) => (
+          {faculty.map((f) => (
             <option key={f.id} value={f.id}>
               {f.name}
             </option>
@@ -135,6 +142,14 @@ export default function QuizForm({
         </select>
         {errors.facultyId && (
           <div className="invalid-feedback">{errors.facultyId}</div>
+        )}
+        {facultyError && (
+          <div className="form-text text-danger">{facultyError}</div>
+        )}
+        {!facultyError && faculty.length === 0 && (
+          <div className="form-text">
+            No faculty accounts yet. A FACULTY user must register first.
+          </div>
         )}
       </div>
 

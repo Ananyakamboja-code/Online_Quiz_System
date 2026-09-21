@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { listQuizzes, removeQuiz } from '../../data/quizStore';
+import { getQuizzes, deleteQuiz } from '../../services/quizService';
 import { formatDate } from '../../utils/format';
 
 /**
@@ -8,16 +8,29 @@ import { formatDate } from '../../utils/format';
  *
  * Lists all quizzes with search and actions to view details, edit, and delete.
  * Admin manages quiz-level data only — there is NO question management here
- * (questions are owned by the Faculty module). Data comes from the in-memory
- * quizStore (mock-backed) so CRUD works during a session without a backend.
+ * (questions are owned by the Faculty module). Data comes from the backend
+ * via quizService.
  */
 export default function QuizManagement() {
   const navigate = useNavigate();
-  const [quizzes, setQuizzes] = useState(() => listQuizzes());
+  const [quizzes, setQuizzes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [detailsQuiz, setDetailsQuiz] = useState(null);
 
-  const refresh = () => setQuizzes(listQuizzes());
+  const refresh = () => {
+    setLoading(true);
+    setError('');
+    getQuizzes()
+      .then(setQuizzes)
+      .catch((e) => setError(e?.response?.data?.message || 'Failed to load quizzes.'))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    refresh();
+  }, []);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -30,11 +43,15 @@ export default function QuizManagement() {
     );
   }, [quizzes, search]);
 
-  const handleDelete = (quiz) => {
+  const handleDelete = async (quiz) => {
     const ok = window.confirm(`Delete quiz "${quiz.title}"?`);
     if (!ok) return;
-    removeQuiz(quiz.id);
-    refresh();
+    try {
+      await deleteQuiz(quiz.id);
+      refresh();
+    } catch (e) {
+      setError(e?.response?.data?.message || 'Failed to delete quiz.');
+    }
   };
 
   return (
@@ -60,6 +77,8 @@ export default function QuizManagement() {
         />
       </div>
 
+      {error && <div className="alert alert-danger">{error}</div>}
+
       <div className="card shadow-sm">
         <div className="table-responsive">
           <table className="table table-hover align-middle mb-0">
@@ -77,7 +96,13 @@ export default function QuizManagement() {
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="text-center text-muted py-4">
+                    Loading…
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="text-center text-muted py-4">
                     No quizzes found.

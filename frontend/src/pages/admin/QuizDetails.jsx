@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { findQuiz } from '../../data/quizStore';
+import { getQuizById } from '../../services/quizService';
 import { formatDate } from '../../utils/format';
 
 /**
@@ -13,10 +13,12 @@ import { formatDate } from '../../utils/format';
 export default function QuizDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [quiz, setQuiz] = useState(undefined); // undefined = loading
+  const [quiz, setQuiz] = useState(undefined); // undefined = loading, null = not found
 
   useEffect(() => {
-    setQuiz(findQuiz(id));
+    getQuizById(id)
+      .then(setQuiz)
+      .catch(() => setQuiz(null));
   }, [id]);
 
   if (quiz === undefined) {

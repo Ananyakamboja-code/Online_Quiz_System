@@ -1,23 +1,37 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import QuizForm from '../../components/admin/QuizForm';
-import { findQuiz, editQuiz } from '../../data/quizStore';
+import { getQuizById, updateQuiz } from '../../services/quizService';
 
 /**
  * Edit Quiz page.
  *
- * Reads the quiz id from the route, prefills the reusable QuizForm, and saves
- * back to the in-memory quizStore (mock-backed). Replace with
- * quizService.getQuizById + updateQuiz when the backend is ready.
+ * Loads the quiz from the backend, prefills the reusable QuizForm, and saves
+ * changes via quizService.
  */
 export default function EditQuiz() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [quiz, setQuiz] = useState(undefined); // undefined = loading
+  const [quiz, setQuiz] = useState(undefined); // undefined = loading, null = not found
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    setQuiz(findQuiz(id));
+    getQuizById(id)
+      .then(setQuiz)
+      .catch((e) => {
+        if (e?.response?.status === 404) setQuiz(null);
+        else setError(e?.response?.data?.message || 'Failed to load quiz.');
+      });
   }, [id]);
+
+  if (error) {
+    return (
+      <div>
+        <h1 className="h3 mb-3">Edit Quiz</h1>
+        <div className="alert alert-danger">{error}</div>
+      </div>
+    );
+  }
 
   if (quiz === undefined) {
     return <p className="text-muted">Loading...</p>;
@@ -37,9 +51,14 @@ export default function EditQuiz() {
     );
   }
 
-  const handleSubmit = (values) => {
-    editQuiz(id, values);
-    navigate('/admin/quizzes');
+  const handleSubmit = async (values) => {
+    setError('');
+    try {
+      await updateQuiz(id, values);
+      navigate('/admin/quizzes');
+    } catch (e) {
+      setError(e?.response?.data?.message || 'Failed to update quiz.');
+    }
   };
 
   return (

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { config } from './config.js';
 import authRoutes from './routes/authRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 const app = express();
 
@@ -16,6 +17,9 @@ app.get('/api/health', (_req, res) => {
 
 // Auth routes
 app.use('/api/auth', authRoutes);
+
+// Admin routes (ADMIN-only, enforced inside the router)
+app.use('/api/admin', adminRoutes);
 
 // 404 for unknown API routes
 app.use((req, res) => {
